@@ -25,10 +25,13 @@
 - 网站服务器部署介绍、应用架构介绍
 - django网站开发实例
 - matplotlib基础
+- numpy基础
+- pandas基础
+- sklearn命令汇总
 
-### 正在进行（预计五一前完成）：
+### 正在进行（预计六一前完成）：
 
 - python基础
+- python高级
 - django基础
-- numpy
 - 爬虫
