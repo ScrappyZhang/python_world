@@ -554,5 +554,16 @@ reverse：排序规则. reverse = True 或者 reverse = False，默认False（�
 返回值：是一个经过排序的可迭代类型，与iterable一样;
 ```
 
+- 查询数据中为空的位置
 
+
+```
+np.argwhere(np.isnan(X_train))
+```
+
+- 查询数据中为无穷的位置
+
+```
+np.argwhere(np.isfinite(X_train))
+```
 

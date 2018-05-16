@@ -1047,7 +1047,8 @@ def jitter(series, factor):
 - df.T 转置，即行列转换
 - df.sort(columns='C')排序
 - ==s.value_counts(dropna=False)：查看Series对象的唯一值和计数==计数统计
-- df.apply(pd.Series.value_counts)：查看DataFrame对象中每一列的唯一值和计数
+- ==s.unique()  # 存在哪些值==
+- ==df.apply(pd.Series.value_counts)：查看DataFrame对象中每一列的唯一值和计数==
 
 ## 数据选取
 
@@ -1307,6 +1308,36 @@ df_obj[df_obj['用户号码'].isin(alist)] #获取匹配结果为ture的行
 
 - df.std()：返回每一列的标准差
 
+```
+count                      非 NA 值的数量
+describe                  针对 Series 或 DF 的列计算汇总统计
+min , max                最小值和最大值
+argmin , argmax      最小值和最大值的索引位置（整数）
+idxmin , idxmax       最小值和最大值的索引值
+quantile                    样本分位数（0 到 1）
+sum                          求和
+mean                        均值
+median                     中位数
+mad                          根据均值计算平均绝对离差
+var                             方差
+std                             标准差
+skew                          样本值的偏度（三阶矩）
+kurt                           样本值的峰度（四阶矩）
+cumsum                     样本值的累计和
+cummin , cummax      样本值的累计最大值和累计最小值
+
+cumprod                     样本值的累计积
+
+diff                              计算一阶差分（对时间序列很有用）
+
+pct_change                  计算百分数变化
+
+```
+
+
+
+  
+
 - ==s.value_counts(dropna=False)：查看Series对象的唯一值和计数==计数统计
 
   - 柱形图
@@ -1450,3 +1481,5 @@ dtype: object
 
 
 
+- 样本随机抽取
+  - df.sample(frac=0.5， random_state=20)  0.5代表抽取的比例
