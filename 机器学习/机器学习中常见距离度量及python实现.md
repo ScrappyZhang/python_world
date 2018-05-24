@@ -136,3 +136,29 @@ minkowski(x, y, 2)
 ```
 
 ## 5. 标准化欧式距离 Standardized Euclidean distance
+
+针对之前提到的欧式距离的缺点，标准欧式距离就是先将各分量标准化到均值和方差相等，然后进行欧式距离计算。
+
+- 两个n维向量`a(x11, x12, …, x1n)`与`b(x21, x22, …, x2n)`间的标准欧式距离
+
+$$
+d_{ 12 }=\sqrt [ 2 ]{ \sum _{ k=1 }^{ n }{ (\frac { x_{1k}-x_{2k} }{ s_k } )^2 }  }
+$$
+
+> 其中Sk为标准差
+
+### python中实现
+
+```
+X=np.vstack([x,y])
+方式一：
+sk=np.var(X,axis=0,ddof=1)
+d1=np.sqrt(((x - y) ** 2 /sk).sum())
+
+方式二：
+from scipy.spatial.distance import pdist
+d2=pdist(X,'seuclidean')
+```
+
+## 6. 马氏距离 Mahalanobis Distance
+
