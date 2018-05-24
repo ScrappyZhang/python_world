@@ -378,7 +378,7 @@ gbm = xgb.XGBClassifier(
         subsample=subsample,  # 采样率
         min_child_weight=min_child_weight,  # 孩子数
         max_delta_step=10,  # 10步不降则停止
-        num_class=3,
+        num_class=3, # 多分类数
         eval_metric='auc',
         objective="multi:softprob"
     )
