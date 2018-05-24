@@ -83,3 +83,56 @@ cityblock(x, y)
 来源于国际象棋中国王从一个格子(x1, y1)到另一个格子(x2, y2)最少需要的步数。它的最少步数为`max(|x2-x1|,|y2-y1|)`步。类似的距离度量方法叫做切比雪夫距离。
 
 - 二维平面两点`a(x1, y1)`与`b(x2, y2)`间的曼哈顿距离
+
+$$
+d_{ 12 }=max(\left| x_1 - x_2  \right|, \left| y_1-y_2 \right| )
+$$
+
+- 两个n维向量`a(x11, x12, …, x1n)`与`b(x21, x22, …, x2n)`间的切比雪夫距离
+
+$$
+d_{ 12 }=\underset { i }{ max} (\left| x_{1i} - x_{2i}  \right|)
+$$
+
+以上公式等价于：
+$$
+d_{ 12 }=\lim _{ k\rightarrow \infty  }{ (\sum _{ i=1 }^{ n }{ (\left| x_{ 1i }-x_{ 2i } \right| ^{ k }) } )^{ \frac { 1 }{ k }  } } 
+$$
+
+### python中实现:
+
+```python
+方式一：
+d1=np.max(np.abs(x-y))
+
+方式二：
+from scipy.spatial.distance import chebyshev
+chebyshev(x, y)
+```
+
+## 4. 闵可夫斯基距离Minkowski Distance
+
+- 两个n维向量`a(x11, x12, …, x1n)`与`b(x21, x22, …, x2n)`间的闵可夫斯基距离
+
+$$
+d_{ 12 }=\sqrt [ p ]{ \sum _{ k=1 }^{ n }{ \left| x_{1k}-x_{2k} \right| ^p }  } 
+$$
+
+> 当p=1时，就是曼哈顿距离
+>
+> 当p=2时，就是欧式距离
+>
+> 当$p \rightarrow \infty $时， 就是切比雪夫距离。
+
+闵可夫距离均存在明显的缺点：例如：
+
+一个二维样本（身高，体重），其中身高范围是`150~190`，体重范围是`50~60`， 有三个样本：`a(180, 50)`, `b(190, 50)`, `c(180,60)`。那么a与b之间的闵式距离等于a与c之间的闵式距离，但是身高10cm真的等价于体重10kg吗？所以衡量样本间相似度，是存在严重缺陷的。可以看到，闵可夫距离仅仅将各个分量的量纲当作单位看待了，而没有考虑各分量的分布（期望、方差等）的不同之处。
+
+### python中实现
+
+```
+from scipy.spatial.distance import minkowski
+minkowski(x, y, 2)
+```
+
+## 5. 标准化欧式距离 Standardized Euclidean distance
