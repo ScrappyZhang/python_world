@@ -1483,3 +1483,10 @@ dtype: object
 
 - 样本随机抽取
   - df.sample(frac=0.5， random_state=20)  0.5代表抽取的比例
+- 编码映射
+
+```
+label_mapping = {'汽车':1, '财经':2, '科技':3, '健康':4, '体育':5, '教育':6, '文化':7, '军事':8, '娱乐':9, '时尚':10}
+df_train['label'] = df_train['label'].map(label_mapping)
+```
+
