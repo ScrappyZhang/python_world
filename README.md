@@ -31,7 +31,7 @@
 - XGBoost原理与实战讲解
 - 机器学习常用距离度量及python实现
 - 机器学习自动调参Hyperopt和贝叶斯调参
-- Keras笔记
+- Keras笔记（以tensorflow为后端）
 
 ### 正在进行（预计六月中旬左右完成）：
 
