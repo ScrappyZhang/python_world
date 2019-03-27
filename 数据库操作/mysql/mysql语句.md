@@ -750,7 +750,7 @@ create table goods(
     cate_id int unsigned,
     brand_id int unsigned,
     is_show bit default 1,
-    is_saleoff bit default 0,
+    is_saleoff bit default 0
 );
 ```
 
