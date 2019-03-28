@@ -746,11 +746,11 @@ select * from goods_cates where id between 1 and 5;
 create table goods(
     id int unsigned primary key auto_increment not null,
     name varchar(40) default '',
-    price decimal(5,2),
-    cate_id int unsigned,
-    brand_id int unsigned,
+    cate_name varchar(10) default '',
+    brand_name varchar(10) default '',
+    price decimal(10,3),
     is_show bit default 1,
-    is_saleoff bit default 0,
+    is_saleoff bit default 0
 );
 ```
 
