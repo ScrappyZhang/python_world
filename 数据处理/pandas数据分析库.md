@@ -1490,7 +1490,7 @@ label_mapping = {'汽车':1, '财经':2, '科技':3, '健康':4, '体育':5, '�
 df_train['label'] = df_train['label'].map(label_mapping)
 ```
 
-30860  30861
+
 
 
 

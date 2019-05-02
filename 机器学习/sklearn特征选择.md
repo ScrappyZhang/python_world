@@ -123,13 +123,104 @@ selector3 = SelectFwe(score_func = chi2,alpha=1)
 >
 > ​    Pearson相关系数等价于线性回归里的标准化回归系数
 
+#### 2.1 卡方(Chi2)检验
+
+　　经典的卡方检验是检验定性自变量对定性因变量的相关性。比如，我们可以对样本进行一次chi2chi2 测试来选择最佳的两项特征：
+
+```
+>>> from sklearn.datasets import load_iris
+>>> from sklearn.feature_selection import SelectKBest
+>>> from sklearn.feature_selection import chi2
+>>> iris = load_iris()
+>>> X, y = iris.data, iris.target
+>>> X.shape
+(150, 4)
+>>> X_new = SelectKBest(chi2, k=2).fit_transform(X, y)
+>>> X_new.shape
+(150, 2)
+```
+
+#### 2.2 Pearson相关系数 (Pearson Correlation)
+
+　　皮尔森相关系数是一种最简单的，能帮助理解特征和响应变量之间关系的方法，该方法衡量的是变量之间的线性相关性，结果的取值区间为[-1，1]，-1表示完全的负相关，+1表示完全的正相关，0表示没有线性相关。
+
+　　Pearson Correlation速度快、易于计算，经常在拿到数据(经过清洗和特征提取之后的)之后第一时间就执行。Scipy的 pearsonr 方法能够同时计算 相关系数 和p-value.
+
+```
+import numpy as np
+from scipy.stats import pearsonr
+np.random.seed(0)
+size = 300
+x = np.random.normal(0, 1, size)
+# pearsonr(x, y)的输入为特征矩阵和目标向量
+print("Lower noise", pearsonr(x, x + np.random.normal(0, 1, size)))
+print("Higher noise", pearsonr(x, x + np.random.normal(0, 10, size)))
+>>>
+# 输出为二元组(sorce, p-value)的数组
+Lower noise (0.71824836862138386, 7.3240173129992273e-49)
+Higher noise (0.057964292079338148, 0.31700993885324746)
+```
+
+这个例子中，我们比较了变量在加入噪音之前和之后的差异。当噪音比较小的时候，相关性很强，p-value很低。
+
+　　Scikit-learn提供的 [f_regrssion](http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.f_regression.html) 方法能够批量计算特征的f_score和p-value，非常方便，参考sklearn的 [pipeline](http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html)
+
+　　**Pearson相关系数的一个明显缺陷是，作为特征排序机制，他只对线性关系敏感。如果关系是非线性的，即便两个变量具有一一对应的关系，Pearson相关性也可能会接近0。**例如：
+
+> x = np.random.uniform(-1, 1, 100000)
+> print pearsonr(x, x**2)[0]
+> -0.00230804707612
+
+　　更多类似的例子参考 [sample plots](http://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Correlation_examples2.svg/506px-Correlation_examples2.svg.png) 。另外，如果仅仅根据相关系数这个值来判断的话，有时候会具有很强的误导性，如 [Anscombe’s quartet](http://www.matrix67.com/blog/archives/2308) ，最好把数据可视化出来，以免得出错误的结论。
+
+#### 2.3 互信息和最大信息系数 (Mutual information and maximal information coefficient (MIC)
+
+　　经典的互信息（互信息为随机变量X与Y之间的互信息I(X;Y)I(X;Y)为单个事件之间互信息的数学期望）也是评价定性自变量对定性因变量的相关性的，互信息计算公式如下：
+
+I(X;Y)=E[I(xi;yj)]=∑xiϵX∑yjϵYp(xi,yj)logp(xi,yj)p(xi)p(yj)I(X;Y)=E[I(xi;yj)]=∑xiϵX∑yjϵYp(xi,yj)logp(xi,yj)p(xi)p(yj)
+
+　　互信息直接用于特征选择其实不是太方便：1、它不属于度量方式，也没有办法归一化，在不同数据及上的结果无法做比较；2、对于连续变量的计算不是很方便（X和Y都是集合，x，y都是离散的取值），通常变量需要先离散化，而互信息的结果对离散化的方式很敏感。
+
+　　最大信息系数克服了这两个问题。它首先寻找一种最优的离散化方式，然后把互信息取值转换成一种度量方式，取值区间在[0，1]。 [minepy](http://minepy.readthedocs.io/en/latest/) 提供了MIC功能。
+
+反过头来看y=x2y=x2这个例子，MIC算出来的互信息值为1(最大的取值)。
+
+```
+from minepy import MINE
+m = MINE()
+x = np.random.uniform(-1, 1, 10000)
+m.compute_score(x, x**2)
+print(m.mic())
+>>>1.0
+```
+
+　　MIC的统计能力遭到了 [一些质疑](http://statweb.stanford.edu/~tibs/reshef/comment.pdf) ，当零假设不成立时，MIC的统计就会受到影响。在有的数据集上不存在这个问题，但有的数据集上就存在这个问题。
+
+#### 2.4 距离相关系数 (Distance Correlation)
+
+　　距离相关系数是为了克服Pearson相关系数的弱点而生的。在xx和x2x2这个例子中，即便Pearson相关系数是0，我们也不能断定这两个变量是独立的（有可能是非线性相关）；但如果距离相关系数是0，那么我们就可以说这两个变量是独立的。
+
+　　R的 energy 包里提供了距离相关系数的实现，另外这是 [Python gist](https://gist.github.com/josef-pkt/2938402) 的实现。
+
+```
+> x = runif (1000, -1, 1)
+> dcor(x, x**2)
+[1] 0.4943864
+```
+
+　　尽管有 MIC 和 距离相关系数 在了，但当变量之间的关系接近线性相关的时候，Pearson相关系数仍然是不可替代的。
+　　第一，Pearson相关系数计算速度快，这在处理大规模数据的时候很重要。
+　　第二，Pearson相关系数的取值区间是[-1，1]，而MIC和距离相关系数都是[0，1]。这个特点使得Pearson相关系数能够表征更丰富的关系，符号表示关系的正负，绝对值能够表示强度。当然，Pearson相关性有效的前提是两个变量的变化关系是单调的。
+
+
+
 ## 3 递归特征消除
 
 Recursive feature elimination  (RFE)
 
 递归特征消除的主要思想是反复的构建模型(如SVM或回归模型)， 然后选出最好的（或最差的）的特征（可以根据系数来选），把选出来的特征选择出来，然后在剩余的特征上重复这个过程，直到所有特征都遍历了。在这个过程中，**特征被消除的次序就是特征的排序**。因此，这是一种**寻找最优特征子集的贪心算法**。
 
-RFE的稳定性很大程度上取决于在迭代过程中底层所选择的模型。例如，RFE采用普通回归时，没有经过正则化的回归是不稳定的，那么RFE就是不稳定的；RFE采用的是Ridge，而Ridge正则化的回归是文档的，那么RFE就是文档的。
+RFE的稳定性很大程度上取决于在迭代过程中底层所选择的模型。例如，RFE采用普通回归时，没有经过正则化的回归是不稳定的，那么RFE就是不稳定的；RFE采用的是Ridge，而Ridge正则化的回归是稳定的，那么RFE就是稳定的。
 
 在sklearn中有两个递归式特征消除的方法：
 
@@ -142,7 +233,7 @@ from sklearn.feature_selection import RFE, RFECV
 
 ### RFE性能升降问题
 
-PFE 自身的特性，使得我们可以比较好的进行手动的特征选择。但是同样的，它也存在原模型在去除特征后的数据集上的性能表现要差于原数据集，这和方差过滤一样，同样是因为去除的特征中保留有有效信息的原因。下面的代码就很好的展示了这种现象。
+RFE 自身的特性，使得我们可以比较好的进行手动的特征选择。但是同样的，它也存在原模型在去除特征后的数据集上的性能表现要差于原数据集，这和方差过滤一样，同样是因为去除的特征中保留有有效信息的原因。下面的代码就很好的展示了这种现象。
 
 ```python
 from sklearn.feature_selection import RFE, RFECV
